@@ -82,7 +82,7 @@ export const updatePr = async(req, res) => {
       .then((product) => {
         res.status(200).json({
           message: 'update success',
-          data: product
+          data: updateData
         })
       })
       .catch((err) => {
@@ -99,7 +99,7 @@ export const updatePr = async(req, res) => {
 
 export const deletePr = async(req, res) => {
   try {
-    await Product.deleteOne({_id: req.params.id})
+    await Product.findOneAndDelete({_id: req.params.id})
       .then((productDeleted) => {
         res.status(200).json({
           message: 'delete success',
