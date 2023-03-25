@@ -1,7 +1,8 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import productRouters from './routes/product.js'
+import productRouters from './routes/product.js';
+import authRouter from './routes/user.js'
 
 // config
 dotenv.config()
@@ -18,7 +19,8 @@ mongoose.connect(process.env.MONGO_URI)
   })
 
 // router
-app.use('/', productRouters)
+app.use('/', productRouters);
+app.use('/', authRouter)
 
 export const viteNodeApp = app;
 
