@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User from "../models/user";
+import User from "../modules/user";
 export const checkPermission = async (req, res, next) => {
     try {
         // kiểm tra xem user có đăng nhập không

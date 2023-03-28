@@ -1,119 +1,101 @@
-import Product from '../modules/product.js';
-import joi from 'joi';
+import dotenv from "dotenv";
+import joi from "joi";
+import Product from "../modules/product.js";
+
+dotenv.config();
+const { API_URI } = process.env;
 
 const productSchema = joi.object({
-  name: joi.string().required(),
-  price: joi.number().required()
-})
+    name: joi.string().required(),
+    price: joi.number().required(),
+    description: joi.string(),
+});
 
-export const create = async(req, res) => {
-  try {
-    const {error} = productSchema.validate(req.body);
-    if(error){
-      return res.status(400).json({
-        message: 'check your value and value type'
-      })
+export const getAll = async (req, res) => {
+    try {
+        // const { data: products } = await axios.get(`${API_URI}/products`);
+        const products = await Product.find();
+        if (products.length === 0) {
+            return res.json({
+                message: "Không có sản phẩm nào",
+            });
+        }
+        return res.json(products);
+    } catch (error) {
+        return res.status(400).json({
+            message: error,
+        });
     }
-    const product = await Product.create(req.body)
-    if(!product){
-      res.status(400).json({
-        message: 'cancel create'
-      })
-    } else {
-      res.status(201).json({
-        message: 'create success',
-        data: product
-      })
+};
+export const get = async function (req, res) {
+    try {
+        // const { data: product } = await axios.get(`${API_URI}/products/${req.params.id}`);
+        const product = await Product.findById(req.params.id);
+        if (!product) {
+            return res.json({
+                message: "Không có sản phẩm nào",
+            });
+        }
+        return res.json(product);
+    } catch (error) {
+        return res.status(400).json({
+            message: error,
+        });
     }
-  } catch (error) {
-    res.status(400).json({
-      message: error
-    })
-  }
-}
-
-export const getAll = async(req, res) => {
-  try {
-    const product = await Product.find();
-    if(product.length === 0){
-      res.status(200).json({
-        message: 'no product here'
-      })
-    } else {
-      res.status(200).json({
-        message: 'fetch data success',
-        data: product
-      })
+};
+export const create = async function (req, res) {
+    try {
+        const { error } = productSchema.validate(req.body);
+        if (error) {
+            return res.status(400).json({
+                message: error.details[0].message,
+            });
+        }
+        // const { data: product } = await axios.post(`${API_URI}/products`, req.body);
+        const product = await Product.create(req.body);
+        if (!product) {
+            return res.json({
+                message: "Không thêm sản phẩm",
+            });
+        }
+        return res.json({
+            message: "Thêm sản phẩm thành công",
+            data: product,
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: error,
+        });
     }
-  } catch (error) {
-    res.status(400).json({
-      message: error
-    })
-  }
-}
-
-export const getOne = async(req, res) => {
-  try {
-    const product = await Product.findById(req.params.id).exec();
-    if(!product){
-      res.status(404).json({
-        message: 'product do not exit'
-      })
-    } else {
-      res.status(200).json({
-        message: 'fetch data success',
-        data: product
-      })
+};
+export const update = async function (req, res) {
+    try {
+        const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!product) {
+            return res.json({
+                message: "Cập nhật sản phẩm không thành công",
+            });
+        }
+        return res.json({
+            message: "Cập nhật sản phẩm thành công",
+            data: product,
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: error,
+        });
     }
-  } catch (error) {
-    res.status(400).json({
-      message: error
-    })
-  }
-}
-
-export const updatePr = async(req, res) => {
-  try {
-    const updateData = {
-      name: req.body.name,
-      price: req.body.price
+};
+export const remove = async function (req, res) {
+    try {
+        const product = await Product.findByIdAndDelete(req.params.id);
+        return res.json({
+            message: "Xóa sản phẩm thành công",
+            product,
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: error,
+        });
     }
-    await Product.updateOne({...updateData})
-      .then((product) => {
-        res.status(200).json({
-          message: 'update success',
-          data: updateData
-        })
-      })
-      .catch((err) => {
-        res.status(400).json({
-          message: 'update failed',
-        })
-      })
-  } catch (error) {
-    res.status(400).json({
-      message: error
-    })
-  }
-}
-
-export const deletePr = async(req, res) => {
-  try {
-    await Product.findOneAndDelete({_id: req.params.id})
-      .then((productDeleted) => {
-        res.status(200).json({
-          message: 'delete success',
-          data: productDeleted
-        })
-      })
-      .catch((err) => {
-        res.status(400).json({
-          message: 'delete failed',
-        })
-      })
-  } catch (error) {
-    res.status(400).json({
-      message: error
-    })
-  }
-}
+};

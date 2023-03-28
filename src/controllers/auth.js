@@ -1,5 +1,5 @@
-import User from "../models/user";
-import { signinSchema, signupSchema } from "../schemas/auth";
+import User from "../modules/user.js";
+import { signinSchema, signupSchema } from "../schemas/auth.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
